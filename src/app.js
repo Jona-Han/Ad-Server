@@ -14,7 +14,6 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 
-// set security HTTP headers
 
 // parse json request body
 app.use(express.json());
@@ -22,13 +21,9 @@ app.use(express.json());
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
 
-// sanitize request data
-
 // enable cors
 app.use(cors());
 app.options('*', cors());
-
-// limit repeated failed requests to auth endpoints
 
 // v1 api routes
 app.use('/v1', routes);

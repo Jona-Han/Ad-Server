@@ -3,7 +3,7 @@
     "node": true,
     "jest": true
   },
-  "extends": ["airbnb-base", "plugin:jest/recommended"],
+  "extends": ["airbnb-base", "plugin:jest/recommended", "prettier"],
   "plugins": ["jest"],
   "parserOptions": {
     "ecmaVersion": "latest"
