@@ -1,0 +1,17 @@
+{
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "extends": ["airbnb-base", "plugin:jest/recommended"],
+  "plugins": ["jest"],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "no-console": "error",
+    "no-underscore-dangle": "off",
+    "consistent-return": "off",
+    "max-len": ["error", { "code": 125 }]
+  }
+}
