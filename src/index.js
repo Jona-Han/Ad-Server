@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const mysql = require('mysql');
 const app = require('./app');
 const logger = require('./config/logger');
