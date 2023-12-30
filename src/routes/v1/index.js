@@ -1,10 +1,15 @@
 const express = require('express');
+const adRoute = require('./ad/ad.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 
 const router = express.Router();
 
 const defaultRoutes = [
+    {
+        path: '/ad',
+        route: adRoute,
+    }
 ];
 
 const devRoutes = [
