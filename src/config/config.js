@@ -9,6 +9,10 @@ const envVarsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(3000),
+    MYSQL_HOST: Joi.string().required().description('the mysql host name'),
+    MYSQL_USER: Joi.string().required().description('the mysql database instance username'),
+    MYSQL_PASSWORD: Joi.string().required().description('the mysql database instance password'),
+    MYSQL_DATABASE: Joi.string().required().description('the database name'),
   })
   .unknown();
 
@@ -21,4 +25,10 @@ if (error) {
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  db: {
+    host: envVars.MYSQL_HOST,
+    user: envVars.MYSQL_USER,
+    password: envVars.MYSQL_PASSWORD,
+    database: envVars.MYSQL_DATABASE,
+  },
 };
