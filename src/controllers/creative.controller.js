@@ -4,7 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const creativeService = require('../services/creative.service');
 
 const createCreative = catchAsync(async (req, res) => {
-  const result = await creativeService.createCreative();
+  const result = await creativeService.createCreative(req.body);
   res.send(result);
 });
 

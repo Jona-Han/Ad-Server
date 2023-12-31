@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
+const dbConnection = require('../index');
 
 /**
  * Create a Creative
@@ -7,7 +8,41 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<Creative>}
  */
 const createCreative = async (body) => {
-  throw new ApiError(httpStatus.BAD_REQUEST, 'NOT IMPLEMENTED');
+  // Check if required fields are in body
+  const requiredFields = ['title', 'isActive', 'typeId', 'advertiserId'];
+  const missingFields = requiredFields.filter((field) => !(field in body));
+
+  if (missingFields.length > 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, `Missing required fields: ${missingFields.join(', ')}`);
+  }
+
+  // Check if advertiserId is valid
+  const checkAdvertiserQuery = 'SELECT COUNT(*) AS count FROM advertisers WHERE id = ?';
+  const [advertiserCountResult] = await dbConnection.query(checkAdvertiserQuery, [body.advertiserId]);
+
+  if (advertiserCountResult[0].count === 0) {
+    throw new ApiError(httpStatus.BAD_REQUEST, `Invalid advertiserId: ${body.advertiserId}`);
+  }
+
+  // Insert into creatives table
+  const insertCreativeQuery = `
+    INSERT INTO creatives (title, is_active, type_id, image_name, image_link, click_url, alt_text, advertiser_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const values = [
+    body.title,
+    body.isActive,
+    body.typeId,
+    body.imageName || null,
+    body.imageLink || null,
+    body.clickUrl || null,
+    body.altText || null,
+    body.advertiserId,
+  ];
+
+  const [result] = await dbConnection.query(insertCreativeQuery, values);
+  return result.insertId;
 };
 
 /**

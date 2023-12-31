@@ -40,8 +40,8 @@
     "coverage:coveralls": "cross-env NODE_ENV=test jest -i --coverage --coverageReporters=text-lcov | coveralls",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prettier": "prettier --check **/**/*.js",
-    "prettier:fix": "prettier --write **/**/*.js"
+    "prettier": "prettier --check '**/*.js'",
+    "prettier:fix": "prettier --write '**/*.js'"
   },
   "jest": {
     "modulePathIgnorePatterns": [

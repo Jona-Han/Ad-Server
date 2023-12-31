@@ -1,33 +1,28 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const mysql = require('mysql');
-const app = require('./app');
 const logger = require('./config/logger');
 const config = require('./config/config');
+const Server = require('./Server')
 
 const dbConnection = mysql.createConnection(config.db);
+const server = new Server();
 
 dbConnection.connect(() => {
-    logger.info('Connected to MySQL');
-});
+  logger.info('Server::Connected to MySQL');
 
-const server = app.listen(config.port, () => {
-    logger.info(`Listening to port ${config.port}`);
+   server.start();
 });
 
 const exitHandler = () => {
   if (dbConnection) {
     dbConnection.end();
-    logger.info('MySQL connection closed');
+    logger.info('Server::MySQL connection closed');
   }
 
   if (server) {
-    server.close(() => {
-      logger.info('Server closed');
-      process.exit(1);
-    });
-  } else {
-    process.exit(1);
+    server.stop();
   }
+  process.exit(1);
 };
 
 const unexpectedErrorHandler = (error) => {
@@ -43,8 +38,10 @@ process.on('SIGTERM', () => {
   if (dbConnection) {
     dbConnection.end();
   }
-  
+
   if (server) {
-    server.close();
+    server.stop();
   }
 });
+
+module.exports = dbConnection;
