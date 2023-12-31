@@ -1,10 +1,11 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { creativeService } = require('../services/creative.service');
+const creativeService = require('../services/creative.service');
 
 const createCreative = catchAsync(async (req, res) => {
-  res.send(creativeService.createCreative());
+  const result = await creativeService.createCreative();
+  res.send(result);
 });
 
 const getAllCreatives = catchAsync(async (req, res) => {

@@ -2,7 +2,9 @@ const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
 
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+dotenv.config({
+  path: process.env.NODE_ENV === 'test' ? path.join(__dirname, '../../.env.test') : path.join(__dirname, '../../.env'),
+});
 
 // Validate env variables
 const envVarsSchema = Joi.object()
@@ -13,6 +15,7 @@ const envVarsSchema = Joi.object()
     MYSQL_USER: Joi.string().required().description('the mysql database instance username'),
     MYSQL_PASSWORD: Joi.string().required().description('the mysql database instance password'),
     MYSQL_DATABASE: Joi.string().required().description('the database name'),
+    MYSQL_TEST_DATABASE: Joi.string().description('the test database name'),
   })
   .unknown();
 

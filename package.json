@@ -25,7 +25,6 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jest": "^27.0.0",
     "eslint-plugin-prettier": "^5.1.2",
     "jest": "^26.0.1",
     "node-mocks-http": "^1.8.0",
@@ -36,12 +35,17 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production src/index.js",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
-    "test": "jest",
-    "coverage": "jest -i --coverage",
-    "coverage:coveralls": "jest -i --coverage --coverageReporters=text-lcov | coveralls",
+    "test": "cross-env NODE_ENV=test jest",
+    "coverage": "cross-env NODE_ENV=test jest -i --coverage",
+    "coverage:coveralls": "cross-env NODE_ENV=test jest -i --coverage --coverageReporters=text-lcov | coveralls",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check **/**/*.js",
     "prettier:fix": "prettier --write **/**/*.js"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+        "ad-server"
+    ]
   }
 }
