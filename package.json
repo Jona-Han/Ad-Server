@@ -6,6 +6,7 @@
   "author": "Jonathan Han <87393036+Jona-Han@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
+    "babel-jest": "^29.7.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
@@ -35,7 +36,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production src/index.js",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
-    "test": "cross-env NODE_ENV=test jest",
+    "test": "cross-env NODE_ENV=test jest -i",
     "coverage": "cross-env NODE_ENV=test jest -i --coverage",
     "coverage:coveralls": "cross-env NODE_ENV=test jest -i --coverage --coverageReporters=text-lcov | coveralls",
     "lint": "eslint .",
@@ -45,7 +46,10 @@
   },
   "jest": {
     "modulePathIgnorePatterns": [
-        "ad-server"
-    ]
+      "ad-server"
+    ],
+    "transform": {
+        "^.+\\.js$": "babel-jest"
+    }
   }
 }

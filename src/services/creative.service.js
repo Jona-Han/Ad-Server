@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
-const dbConnection = require('../index');
+const DbConnection = require('../config/DbConnection');
+const logger = require('../config/logger')
 
 /**
  * Create a Creative
@@ -8,9 +9,11 @@ const dbConnection = require('../index');
  * @returns {Promise<Creative>}
  */
 const createCreative = async (body) => {
+    logger.info('---------creatCreative')
   // Check if required fields are in body
   const requiredFields = ['title', 'isActive', 'typeId', 'advertiserId'];
   const missingFields = requiredFields.filter((field) => !(field in body));
+  const dbConnection = DbConnection.getInstance();
 
   if (missingFields.length > 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, `Missing required fields: ${missingFields.join(', ')}`);
@@ -51,6 +54,7 @@ const createCreative = async (body) => {
  * @returns {Promise<>}
  */
 const getAllCreatives = async (advertiserId) => {
+    logger.info('GETALLCREATIVES_---------------');
   throw new ApiError(httpStatus.BAD_REQUEST, 'NOT IMPLEMENTED');
 };
 

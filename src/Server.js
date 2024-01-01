@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+const mysql = require('mysql');
 const express = require('express');
 const cors = require('cors');
 const httpStatus = require('http-status');
@@ -7,8 +9,9 @@ const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const logger = require('./config/logger');
+const DbConnection = require('./config/DbConnection');
 
-class Server {
+module.exports = class Server {
   port;
 
   app;
@@ -35,9 +38,9 @@ class Server {
         logger.error('Server::start() - server already listening');
         reject();
       } else {
-        this.server = this.app
-          .listen(this.port, () => {
+        this.server = this.app.listen(this.port, () => {
             logger.info(`Server::start() - server listening on port: ${this.port}`);
+            DbConnection.startDb();
             resolve();
           });
       }
@@ -59,6 +62,7 @@ class Server {
       } else {
         this.app.close(() => {
           logger.info('Server::stop() - server closed');
+          DbConnection.stopDb();
           resolve();
         });
       }
@@ -97,5 +101,3 @@ class Server {
     this.app.use(errorHandler);
   }
 }
-
-module.exports = Server;
