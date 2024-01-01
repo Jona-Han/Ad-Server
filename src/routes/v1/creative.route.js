@@ -4,9 +4,9 @@ const creativeController = require('../../controllers/creative.controller');
 const router = express.Router();
 
 router.get('/', creativeController.getAllCreatives);
-router.get('/:id', creativeController.getCreative);
-router.put('/:id', creativeController.updateCreative);
+router.get('/:creativeId', creativeController.getCreative);
+router.put('/:creativeId', creativeController.updateCreative);
 router.post('/', creativeController.createCreative);
-router.delete('/:id', creativeController.deleteCreative);
+router.delete('/:creativeId', creativeController.deleteCreative);
 
 module.exports = router;

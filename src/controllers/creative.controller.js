@@ -8,20 +8,20 @@ const createCreative = catchAsync(async (req, res) => {
 });
 
 const getAllCreatives = catchAsync(async (req, res) => {
-  logger.info('REQUEST RECEIVED');
   res.send(await creativeService.getAllCreatives());
 });
 
 const getCreative = catchAsync(async (req, res) => {
-  res.send(await creativeService.getCreativeById());
+  const result = await creativeService.getCreativeById(req.params.creativeId);
+  res.send(result);
 });
 
 const updateCreative = catchAsync(async (req, res) => {
-  res.send(await creativeService.updateCreativeById());
+  res.send(await creativeService.updateCreativeById(req.params.creativeId, req.body));
 });
 
 const deleteCreative = catchAsync(async (req, res) => {
-  res.send(await creativeService.deleteCreativeById());
+  res.send(await creativeService.deleteCreativeById(req.params.creativeId));
 });
 
 module.exports = {
