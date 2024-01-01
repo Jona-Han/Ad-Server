@@ -107,28 +107,24 @@ const updateCreativeById = async (creativeId, reqBody) => {
   if (result.length === 0) {
     throw new ApiError(httpStatus.NOT_FOUND, `Failed to update creative with id ${creativeId} because not found`);
   }
+
   const resultInCamelCase = {
-    Id: result[0].id,
-    Title: result[0].title,
-    IsActive: result[0].is_active === 1,
-    TypeId: result[0].type_id,
-    ImageName: result[0].image_name,
-    ImageLink: result[0].image_link,
-    ClickUrl: result[0].click_url,
-    AltText: result[0].alt_text,
-    AdvertiserId: result[0].advertiser_id,
+    Title: reqBody.Title || result[0].title,
+    IsActive: reqBody.IsActive !== undefined ? reqBody.IsActive : result[0].is_active,
+    TypeId: reqBody.TypeId || result[0].type_id,
+    ImageName: reqBody.ImageName || result[0].image_name,
+    ImageLink: reqBody.ImageLink || result[0].image_link,
+    ClickUrl: reqBody.ClickUrl || result[0].click_url,
+    AltText: reqBody.AltText || result[0].alt_text,
+    AdvertiserId: reqBody.AdvertiserId || result[0].advertiser_id,
   };
 
-  const updateQuery = `UPDATE creative SET FROM creatives WHERE id = ?`;
-  const afterDelete = await DbConnection.query(deleteQuery, [creativeId]);
-  if (afterDelete.affectedRows !== 1) {
-    throw new ApiError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      `Failed to delete creative with id ${creativeId} due to server error`,
-    );
-  }
+  const updateQuery = `UPDATE creatives 
+  SET title = ?, is_active = ?, type_id = ?, image_name = ?, image_link = ?, click_url = ?, alt_text = ?, advertiser_id = ? 
+  WHERE id = ?`;
+  await DbConnection.query(updateQuery, Object.values(resultInCamelCase).concat([creativeId]));
 
-  return resultInCamelCase;
+  return {Id: creativeId, ...resultInCamelCase};
 };
 
 /**
