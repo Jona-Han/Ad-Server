@@ -20,4 +20,4 @@ CREATE TABLE creatives (
     ON DELETE CASCADE
 );
 
-INSERT INTO advertisers(name) VALUES ('nike');
+INSERT INTO advertisers(id, name) VALUES (1, 'nike');

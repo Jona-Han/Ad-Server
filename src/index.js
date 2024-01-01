@@ -1,4 +1,4 @@
-const Server = require('./Server')
+const Server = require('./Server');
 const logger = require('./config/logger');
 const DbConnection = require('./config/DbConnection');
 
@@ -35,4 +35,5 @@ process.on('SIGTERM', async () => {
   if (server) {
     await server.stop();
   }
+  process.exit(1);
 });

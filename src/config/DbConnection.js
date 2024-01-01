@@ -34,8 +34,13 @@ class DbConnection {
     });
   }
 
-  query(queryString) {
-    return this.connection.query(queryString);
+  query(queryString, values) {
+    return new Promise((resolve, reject) => {
+      this.connection.query(queryString, values, (error, results) => {
+        if (error) reject(error);
+        resolve(results);
+      });
+    });
   }
 }
 

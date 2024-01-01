@@ -1,5 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-const mysql = require('mysql');
 const express = require('express');
 const cors = require('cors');
 const httpStatus = require('http-status');
@@ -39,10 +37,10 @@ module.exports = class Server {
         reject();
       } else {
         this.server = this.app.listen(this.port, () => {
-            logger.info(`Server::start() - server listening on port: ${this.port}`);
-            DbConnection.startDb();
-            resolve();
-          });
+          logger.info(`Server::start() - server listening on port: ${this.port}`);
+          DbConnection.startDb();
+          resolve();
+        });
       }
     });
   }
@@ -56,15 +54,19 @@ module.exports = class Server {
   stop() {
     logger.info('Server::stop()');
     return new Promise((resolve, reject) => {
-      if (this.app === undefined) {
+      if (this.server === undefined) {
         logger.error('Server::stop() - ERROR: server not started');
         reject();
       } else {
-        this.app.close(() => {
-          logger.info('Server::stop() - server closed');
-          DbConnection.stopDb();
-          resolve();
-        });
+        this.server
+          .close(() => {
+            logger.info('Server::stop() - server closed');
+            DbConnection.stopDb();
+            resolve();
+          })
+          .catch(() => {
+            reject();
+          });
       }
     });
   }
@@ -100,4 +102,4 @@ module.exports = class Server {
     // handle error
     this.app.use(errorHandler);
   }
-}
+};

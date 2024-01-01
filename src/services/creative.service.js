@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const DbConnection = require('../config/DbConnection');
-const logger = require('../config/logger')
+const logger = require('../config/logger');
 
 /**
  * Create a Creative
@@ -9,11 +9,9 @@ const logger = require('../config/logger')
  * @returns {Promise<Creative>}
  */
 const createCreative = async (body) => {
-    logger.info('---------creatCreative')
   // Check if required fields are in body
-  const requiredFields = ['title', 'isActive', 'typeId', 'advertiserId'];
+  const requiredFields = ['Title', 'IsActive', 'TypeId', 'AdvertiserId'];
   const missingFields = requiredFields.filter((field) => !(field in body));
-  const dbConnection = DbConnection.getInstance();
 
   if (missingFields.length > 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, `Missing required fields: ${missingFields.join(', ')}`);
@@ -21,7 +19,7 @@ const createCreative = async (body) => {
 
   // Check if advertiserId is valid
   const checkAdvertiserQuery = 'SELECT COUNT(*) AS count FROM advertisers WHERE id = ?';
-  const [advertiserCountResult] = await dbConnection.query(checkAdvertiserQuery, [body.advertiserId]);
+  const advertiserCountResult = await DbConnection.query(checkAdvertiserQuery, [body.AdvertiserId]);
 
   if (advertiserCountResult[0].count === 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, `Invalid advertiserId: ${body.advertiserId}`);
@@ -34,18 +32,31 @@ const createCreative = async (body) => {
   `;
 
   const values = [
-    body.title,
-    body.isActive,
-    body.typeId,
-    body.imageName || null,
-    body.imageLink || null,
-    body.clickUrl || null,
-    body.altText || null,
-    body.advertiserId,
+    body.Title,
+    body.IsActive,
+    body.TypeId,
+    body.ImageName || null,
+    body.ImageLink || null,
+    body.ClickUrl || null,
+    body.AltText || null,
+    body.AdvertiserId,
   ];
 
-  const [result] = await dbConnection.query(insertCreativeQuery, values);
-  return result.insertId;
+  const result = await DbConnection.query(insertCreativeQuery, values);
+
+  const entryJustAdded = {
+    Id: result.insertId,
+    Title: body.Title,
+    IsActive: body.IsActive,
+    TypeId: body.TypeId,
+    ImageName: body.ImageName || null,
+    ImageLink: body.ImageLink || null,
+    ClickUrl: body.ClickUrl || null,
+    AltText: body.AltText || null,
+    AdvertiserId: body.AdvertiserId,
+  };
+
+  return entryJustAdded;
 };
 
 /**
@@ -54,7 +65,6 @@ const createCreative = async (body) => {
  * @returns {Promise<>}
  */
 const getAllCreatives = async (advertiserId) => {
-    logger.info('GETALLCREATIVES_---------------');
   throw new ApiError(httpStatus.BAD_REQUEST, 'NOT IMPLEMENTED');
 };
 

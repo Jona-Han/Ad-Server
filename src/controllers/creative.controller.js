@@ -1,5 +1,3 @@
-const httpStatus = require('http-status');
-const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const creativeService = require('../services/creative.service');
 const logger = require('../config/logger');
@@ -10,7 +8,7 @@ const createCreative = catchAsync(async (req, res) => {
 });
 
 const getAllCreatives = catchAsync(async (req, res) => {
-    logger.info('REQUEST RECEIVED')
+  logger.info('REQUEST RECEIVED');
   res.send(await creativeService.getAllCreatives());
 });
 
