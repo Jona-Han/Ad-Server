@@ -1,19 +1,16 @@
 const catchAsync = require('../utils/catchAsync');
 const creativeService = require('../services/creative.service');
-const logger = require('../config/logger');
 
 const createCreative = catchAsync(async (req, res) => {
-  const result = await creativeService.createCreative(req.body);
-  res.send(result);
+  res.send(await creativeService.createCreative(req.body));
 });
 
 const getAllCreatives = catchAsync(async (req, res) => {
-  res.send(await creativeService.getAllCreatives());
+  res.send(await creativeService.getAllCreatives(req.body));
 });
 
 const getCreative = catchAsync(async (req, res) => {
-  const result = await creativeService.getCreativeById(req.params.creativeId);
-  res.send(result);
+  res.send(await creativeService.getCreativeById(req.params.creativeId));
 });
 
 const updateCreative = catchAsync(async (req, res) => {

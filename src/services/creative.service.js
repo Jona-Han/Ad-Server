@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const DbConnection = require('../config/DbConnection');
 const logger = require('../config/logger');
+const convertKeysToCamelCase = require('../utils/convertKeysToCamel');
 
 /**
  * Create a Creative
@@ -10,7 +11,7 @@ const logger = require('../config/logger');
  */
 const createCreative = async (body) => {
   // Check if required fields are in body
-  const requiredFields = ['Title', 'IsActive', 'TypeId', 'AdvertiserId'];
+  const requiredFields = ['title', 'isActive', 'typeId', 'advertiserId'];
   const missingFields = requiredFields.filter((field) => !(field in body));
 
   if (missingFields.length > 0) {
@@ -19,7 +20,7 @@ const createCreative = async (body) => {
 
   // Check if advertiserId is valid
   const checkAdvertiserQuery = 'SELECT COUNT(*) AS count FROM advertisers WHERE id = ?';
-  const advertiserCountResult = await DbConnection.query(checkAdvertiserQuery, [body.AdvertiserId]);
+  const advertiserCountResult = await DbConnection.query(checkAdvertiserQuery, [body.advertiserId]);
 
   if (advertiserCountResult[0].count === 0) {
     throw new ApiError(httpStatus.BAD_REQUEST, `Invalid advertiserId: ${body.advertiserId}`);
@@ -31,32 +32,20 @@ const createCreative = async (body) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    body.Title,
-    body.IsActive,
-    body.TypeId,
-    body.ImageName || null,
-    body.ImageLink || null,
-    body.ClickUrl || null,
-    body.AltText || null,
-    body.AdvertiserId,
-  ];
-
-  const result = await DbConnection.query(insertCreativeQuery, values);
-
-  const entryJustAdded = {
-    Id: result.insertId,
-    Title: body.Title,
-    IsActive: body.IsActive,
-    TypeId: body.TypeId,
-    ImageName: body.ImageName || null,
-    ImageLink: body.ImageLink || null,
-    ClickUrl: body.ClickUrl || null,
-    AltText: body.AltText || null,
-    AdvertiserId: body.AdvertiserId,
+  const valuesToAdd = {
+    title: body.title,
+    isActive: body.isActive,
+    typeId: body.typeId,
+    imageName: body.imageName || null,
+    imageLink: body.imageLink || null,
+    clickUrl: body.clickUrl || null,
+    altText: body.altText || null,
+    advertiserId: body.advertiserId,
   };
 
-  return entryJustAdded;
+  const result = await DbConnection.query(insertCreativeQuery, Object.values(valuesToAdd));
+
+  return {id: result.insertId, ...valuesToAdd};
 };
 
 /**
@@ -64,8 +53,16 @@ const createCreative = async (body) => {
  * @param {ObjectId} advertiserId
  * @returns {Promise<>}
  */
-const getAllCreatives = async (advertiserId) => {
-  throw new ApiError(httpStatus.BAD_REQUEST, 'NOT IMPLEMENTED');
+const getAllCreatives = async (reqBody) => {
+    if (reqBody.AdvertiserId === undefined) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to get creatives due to missing AdvertiserId in body');
+    }
+
+    const getQuery = 'SELECT * FROM creatives WHERE advertiser_id = ?';
+
+    const result = await DbConnection.query(getQuery, [reqBody.dvertiserId]);
+
+    return result;
 };
 
 /**
@@ -80,17 +77,8 @@ const getCreativeById = async (creativeId) => {
     throw new ApiError(httpStatus.NOT_FOUND, `Creative with id ${creativeId} not found`);
   }
 
-  const resultInCamelCase = {
-    Id: result[0].id,
-    Title: result[0].title,
-    IsActive: result[0].is_active === 1,
-    TypeId: result[0].type_id,
-    ImageName: result[0].image_name,
-    ImageLink: result[0].image_link,
-    ClickUrl: result[0].click_url,
-    AltText: result[0].alt_text,
-    AdvertiserId: result[0].advertiser_id,
-  };
+  const resultInCamelCase = convertKeysToCamelCase(result[0])
+  resultInCamelCase.isActive = resultInCamelCase.isActive === 1;
 
   return resultInCamelCase;
 };
@@ -109,14 +97,14 @@ const updateCreativeById = async (creativeId, reqBody) => {
   }
 
   const resultInCamelCase = {
-    Title: reqBody.Title || result[0].title,
-    IsActive: reqBody.IsActive !== undefined ? reqBody.IsActive : result[0].is_active,
-    TypeId: reqBody.TypeId || result[0].type_id,
-    ImageName: reqBody.ImageName || result[0].image_name,
-    ImageLink: reqBody.ImageLink || result[0].image_link,
-    ClickUrl: reqBody.ClickUrl || result[0].click_url,
-    AltText: reqBody.AltText || result[0].alt_text,
-    AdvertiserId: reqBody.AdvertiserId || result[0].advertiser_id,
+    title: reqBody.title || result[0].title,
+    isActive: reqBody.isActive !== undefined ? reqBody.isActive : result[0].is_active,
+    typeId: reqBody.typeId || result[0].type_id,
+    imageName: reqBody.imageName || result[0].image_name,
+    imageLink: reqBody.imageLink || result[0].image_link,
+    clickUrl: reqBody.clickUrl || result[0].click_url,
+    altText: reqBody.altText || result[0].alt_text,
+    advertiserId: reqBody.advertiserId || result[0].advertiser_id,
   };
 
   const updateQuery = `UPDATE creatives 
@@ -139,17 +127,9 @@ const deleteCreativeById = async (creativeId) => {
     throw new ApiError(httpStatus.NOT_FOUND, `Failed to delete creative with id ${creativeId} because not found`);
   }
 
-  const resultInCamelCase = {
-    Id: result[0].id,
-    Title: result[0].title,
-    IsActive: result[0].is_active === 1,
-    TypeId: result[0].type_id,
-    ImageName: result[0].image_name,
-    ImageLink: result[0].image_link,
-    ClickUrl: result[0].click_url,
-    AltText: result[0].alt_text,
-    AdvertiserId: result[0].advertiser_id,
-  };
+ 
+  const resultInCamelCase = convertKeysToCamelCase(result[0]);
+  resultInCamelCase.isActive = resultInCamelCase.isActive === 1;
 
   const deleteQuery = `DELETE FROM creatives WHERE id = ?`;
   const afterDelete = await DbConnection.query(deleteQuery, [creativeId]);
@@ -159,6 +139,8 @@ const deleteCreativeById = async (creativeId) => {
       `Failed to delete creative with id ${creativeId} due to server error`,
     );
   }
+
+  
 
   return resultInCamelCase;
 };
