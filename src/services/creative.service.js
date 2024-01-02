@@ -54,14 +54,18 @@ const createCreative = async (body) => {
  * @returns {Promise<>}
  */
 const getAllCreatives = async (reqBody) => {
-    if (reqBody.AdvertiserId === undefined) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to get creatives due to missing AdvertiserId in body');
+    if (reqBody.advertiserId === undefined) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Failed to get creatives due to missing advertiserId in body');
     }
 
     const getQuery = 'SELECT * FROM creatives WHERE advertiser_id = ?';
 
-    const result = await DbConnection.query(getQuery, [reqBody.dvertiserId]);
+    const result = await DbConnection.query(getQuery, [reqBody.advertiserId]);
 
+    result.forEach((creative, index) => {
+        result[index] = convertKeysToCamelCase(creative);
+        result[index].isActive = result[index].isActive === 1;
+    });
     return result;
 };
 
@@ -112,7 +116,7 @@ const updateCreativeById = async (creativeId, reqBody) => {
   WHERE id = ?`;
   await DbConnection.query(updateQuery, Object.values(resultInCamelCase).concat([creativeId]));
 
-  return {Id: creativeId, ...resultInCamelCase};
+  return {id: parseInt(creativeId, 10), ...resultInCamelCase};
 };
 
 /**
@@ -139,8 +143,6 @@ const deleteCreativeById = async (creativeId) => {
       `Failed to delete creative with id ${creativeId} due to server error`,
     );
   }
-
-  
 
   return resultInCamelCase;
 };
